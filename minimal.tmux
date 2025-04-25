@@ -25,6 +25,11 @@ get_tmux_option() {
 # - @minimal-tmux-justify: justification of the status line (left, centre or right)
 # - @minimal-tmux-indicator: whether to show the indicator of the prefix
 # - @minimal-tmux-indicator-str: string of the indicator
+# - @minimal-tmux-indicator-active-str: string of the indicator when active
+# - @minimal-tmux-indicator-active-fg: foreground color of the indicator when active
+# - @minimal-tmux-indicator-active-bg: background color of the indicator when active
+# - @minimal-tmux-indicator-fg: foreground color of the indicator
+# - @minimal-tmux-indicator-bg: background color of the indicator
 # - @minimal-tmux-right: whether to show the right side of the status line
 # - @minimal-tmux-left: whether to show the left side of the status line
 # - @minimal-tmux-status-right: content of the right side of the status line
@@ -53,17 +58,23 @@ justify=$(get_tmux_option "@minimal-tmux-justify" "centre")
 
 indicator_state=$(get_tmux_option "@minimal-tmux-indicator" true)
 indicator_str=$(get_tmux_option "@minimal-tmux-indicator-str" " tmux ")
+indicator_active_str=$(get_tmux_option "@minimal-tmux-indicator-active-str" ${indicator_str})
 indicator=$("$indicator_state" && echo " $indicator_str ")
+indicator_active=$("$indicator_state" && echo " $indicator_active_str ")
+indicator_active_fg=$(get_tmux_option "@minimal-tmux-indicator-active-fg" ${fg})
+indicator_active_bg=$(get_tmux_option "@minimal-tmux-indicator-active-bg" ${bg})
+indicator_fg=$(get_tmux_option "@minimal-tmux-indicator-fg" "default")
+indicator_bg=$(get_tmux_option "@minimal-tmux-indicator-bg" "default")
 
 right_state=$(get_tmux_option "@minimal-tmux-right" true)
 left_state=$(get_tmux_option "@minimal-tmux-left" true)
 
 status_right=$("$right_state" && get_tmux_option "@minimal-tmux-status-right" "#S")
-status_left=$("$left_state" && get_tmux_option "@minimal-tmux-status-left" "${default_color}#{?client_prefix,,${indicator}}#[bg=${bg},fg=${fg},bold]#{?client_prefix,${indicator},}${default_color}")
+status_left=$("$left_state" && get_tmux_option "@minimal-tmux-status-left" "#[bg=${indicator_bg},fg=${indicator_fg},bold]#{?client_prefix,,${indicator}}#[bg=${indicator_active_bg},fg=${indicator_active_fg},bold]#{?client_prefix,${indicator_active},}${default_color}")
 status_right_extra="$status_right$(get_tmux_option "@minimal-tmux-status-right-extra" "")"
 status_left_extra="$status_left$(get_tmux_option "@minimal-tmux-status-left-extra" "")"
 
-window_status_format=$(get_tmux_option "@minimal-tmux-window-status-format" ' #I:#W ')
+window_status_format=$(get_tmux_option "@minimal-tmux-window-status-format" " #I:#W ")
 
 expanded_icon=$(get_tmux_option "@minimal-tmux-expanded-icon" '󰊓 ')
 show_expanded_icon_for_all_tabs=$(get_tmux_option "@minimal-tmux-show-expanded-icon-for-all-tabs" false)
@@ -76,7 +87,9 @@ tmux set-option -g status-justify "$justify"
 tmux set-option -g status-left "$status_left_extra"
 tmux set-option -g status-right "$status_right_extra"
 
-tmux set-option -g window-status-format "$window_status_format"
+tmux set-option -g window-status-format "#[dim]$window_status_format"
+tmux set-option -w -t :1 window-status-format " #[dim]$window_status_format"
 "$show_expanded_icon_for_all_tabs" && tmux set-option -g window-status-format " ${window_status_format}#{?window_zoomed_flag,${expanded_icon},}"
 
-tmux set-option -g window-status-current-format "#[fg=${bg}]$larrow#[bg=${bg},fg=${fg}]${window_status_format}#{?window_zoomed_flag,${expanded_icon},}#[fg=${bg},bg=default]$rarrow"
+tmux set-option -g window-status-current-format "#[fg=${bg}]$larrow#[bg=${bg},fg=${fg},bold,italics]${window_status_format}#{?window_zoomed_flag,${expanded_icon},}#[fg=${bg},bg=default]$rarrow"
+tmux set-option -w -t :1 window-status-current-format "#[bg=${bg},fg=${fg},bold,italics] ${window_status_format}#{?window_zoomed_flag,${expanded_icon},}#[fg=${bg},bg=default]$rarrow"

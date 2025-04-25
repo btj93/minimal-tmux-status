@@ -66,6 +66,7 @@ set -g @minimal-tmux-use-arrow true
 set -g @minimal-tmux-right-arrow ""
 set -g @minimal-tmux-left-arrow ""
 ```
+
 </details>
 
 <br>
@@ -77,6 +78,11 @@ set -g @minimal-tmux-fg "#000000"
 set -g @minimal-tmux-bg "#698DDA"
 set -g @minimal-tmux-justify "centre"
 set -g @minimal-tmux-indicator-str "  tmux  "
+set -g @minimal-tmux-indicator-active-str "  tmux  "
+set -g @minimal-tmux-indicator-active-fg "#000000"
+set -g @minimal-tmux-indicator-active-bg "#698DDA"
+set -g @minimal-tmux-indicator-fg "default"
+set -g @minimal-tmux-indicator-bg "default"
 set -g @minimal-tmux-indicator true
 set -g @minimal-tmux-status "bottom"
 
@@ -135,7 +141,7 @@ I recommend using [Tmux Plugin Manager (TPM)](https://github.com/tmux-plugins/tp
 1. Add the theme to your list of TPM plugins in your `~/.tmux.conf`:
 
    ```bash
-   set -g @plugin 'niksingh710/minimal-tmux-status'
+   set -g @plugin 'btj93/minimal-tmux-status'
    ```
 
 2. Press `prefix` + <kbd>I</kbd> (capital "i", as in Install) to fetch and install the plugin.
